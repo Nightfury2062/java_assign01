@@ -6,9 +6,10 @@ abstract class Vehicle {
     private double maxSpeed;
     private double currentMileage;
 
-    public Vehicle(String id, String model, double maxSpeed, double currentMileage){
-        if(id == null || id.trim().length()>0){
-            //invalidOperationException 
+    public Vehicle(String id, String model, double maxSpeed,double currentMileage){
+        if(id == null || id.trim().isEmpty()){
+            // throw new InvalidOperationException("Vehicle ID cannot be empty");
+             
         }
         this.id = id;
         this.model = model;
@@ -30,13 +31,16 @@ abstract class Vehicle {
     String getID(){
         return id;
     }
+    double getMaxSpeed(){
+        return maxSpeed;
+    }
 
     //Abstract methods
 
     abstract void move(double distance);
     abstract double calculateFuelEfficiency();
     abstract double estimateJourneyTime(double distance);
-    
+
 
 
 
