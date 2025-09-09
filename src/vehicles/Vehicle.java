@@ -16,12 +16,27 @@ abstract class Vehicle {
         this.currentMileage = currentMileage;
     }
 
+    //Concrete methods
+
     void displayInfo(){
         System.out.printf(
             "Vehicle Info:\nID: %s\nModel: %s\nMax Speed: %.2f km/h\nCurrent Mileage: %.2f km\n",
             id, model, maxSpeed, currentMileage
         );
     }
+    double getCurrentMileage(){
+        return currentMileage;
+    }
+    String getID(){
+        return id;
+    }
+
+    //Abstract methods
+
+    abstract void move(double distance);
+    abstract double calculateFuelEfficiency();
+    abstract double estimateJourneyTime(double distance);
+    
 
 
 
