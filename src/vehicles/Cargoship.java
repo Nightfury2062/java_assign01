@@ -1,5 +1,5 @@
 package vehicles;
 
-public class Cargoship {
+public class CargoShip {
     
 }

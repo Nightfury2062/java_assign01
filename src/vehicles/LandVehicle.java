@@ -1,9 +1,9 @@
 package vehicles;
 
-abstract class Land_vehicle extends Vehicle{
+abstract class LandVehicle extends Vehicle{
     private int numWheels;
 
-    public Land_vehicle(String id, String model, double maxSpeed, double currentMileage, int numWheels){
+    public LandVehicle(String id, String model, double maxSpeed, double currentMileage, int numWheels){
         super(id,model,maxSpeed,currentMileage);
         this.numWheels = numWheels;
 
