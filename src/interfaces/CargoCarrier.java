@@ -1,6 +1,6 @@
 package interfaces;
 
-interface CargoCarrier {
+public interface CargoCarrier {
     void loadCargo(double weight);
     double unloadCargo(double weight);
     double getCargoCapacity();

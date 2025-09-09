@@ -34,6 +34,10 @@ abstract class Vehicle {
     double getMaxSpeed(){
         return maxSpeed;
     }
+    public void setCurrentMileage(double mileage) {
+    this.currentMileage = mileage;
+}
+
 
     //Abstract methods
 
