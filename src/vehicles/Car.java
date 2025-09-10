@@ -102,7 +102,7 @@ public class Car extends LandVehicle implements FuelConsumable,PassengerCarrier,
 
     @Override
     public boolean needsMaintenance(){
-        return (getCurrentMileage() > 10000 || maintenanceNeeded);
+        return ((getCurrentMileage()>10000) || maintenanceNeeded);
     }
 
     @Override
