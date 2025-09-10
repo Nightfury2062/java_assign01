@@ -2,7 +2,7 @@ package interfaces;
 
 public interface CargoCarrier {
     void loadCargo(double weight);
-    double unloadCargo(double weight);
+    void unloadCargo(double weight);
     double getCargoCapacity();
     double getCurrentCargo();
 }
