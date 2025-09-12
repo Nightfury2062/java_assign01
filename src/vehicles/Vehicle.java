@@ -2,7 +2,7 @@ package vehicles;
 import exceptions.InsufficientFuelException;
 import exceptions.InvalidOperationException;
 
-abstract class Vehicle {
+public abstract class Vehicle implements Comparable<Vehicle>{
     private String id;
     private String model;
     private double maxSpeed;
@@ -27,27 +27,34 @@ abstract class Vehicle {
             id, model, maxSpeed, currentMileage
         );
     }
-    double getCurrentMileage(){
+    public double getCurrentMileage(){
         return currentMileage;
     }
-    String getID(){
+    public String getID(){
         return id;
     }
-    String getmModel(){
+    public String getModel(){
         return model;
     }
-    double getMaxSpeed(){
+    public double getMaxSpeed(){
         return maxSpeed;
     }
     public void setCurrentMileage(double mileage) {
     this.currentMileage = mileage;
-}
+    }
+
+    @Override
+    public int compareTo(Vehicle other) {
+        double o = other.calculateFuelEfficiency();
+        double my = this.calculateFuelEfficiency();
+        return Double.compare(o, my);
+    }
 
 
     //Abstract methods
 
-    abstract void move(double distance)throws InvalidOperationException, InsufficientFuelException;;
-    abstract double calculateFuelEfficiency();
+    public abstract void move(double distance)throws InvalidOperationException, InsufficientFuelException;;
+    public abstract double calculateFuelEfficiency();
     abstract double estimateJourneyTime(double distance);
 
 

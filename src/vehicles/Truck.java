@@ -2,7 +2,6 @@ package vehicles;
 
 import interfaces.CargoCarrier;
 import interfaces.FuelConsumable;
-import interfaces.PassengerCarrier;
 import interfaces.Maintainable;
 
 import exceptions.InvalidOperationException;

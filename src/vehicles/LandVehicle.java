@@ -17,4 +17,7 @@ abstract class LandVehicle extends Vehicle{
         return base_time*1.1;
         
     }
+    public int getNumWheels(){
+        return numWheels;
+    }
 }
