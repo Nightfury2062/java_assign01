@@ -1,18 +1,21 @@
 package vehicles;
 
+import exceptions.InvalidOperationException;
+import exceptions.OverloadException;
+import exceptions.InsufficientFuelException;
 import interfaces.CargoCarrier;
 import interfaces.Maintainable;
 import interfaces.FuelConsumable;
 
-public class CargoShip extends WaterVehicle implements CargoCarrier, Maintainable, FuelConsumable{
+public class CargoShip extends WaterVehicle implements CargoCarrier, Maintainable, FuelConsumable {
 
     private final double cargoCapacity;
     private double currentCargo;
     private boolean maintenanceNeeded;
     private double fuelLevel;
 
-    public CargoShip(String id, String model, double maxSpeed, double currentMileage, boolean hasSail){
-        super(id, model, maxSpeed, currentMileage, hasSail);
+    public CargoShip(String id,String model,double maxSpeed,double currentMileage,boolean hasSail)throws InvalidOperationException{
+        super(id,model,maxSpeed,currentMileage,hasSail);
         this.cargoCapacity = 50000.0;
         this.currentCargo = 0.0;
         this.maintenanceNeeded = false;
@@ -20,23 +23,25 @@ public class CargoShip extends WaterVehicle implements CargoCarrier, Maintainabl
     }
 
     @Override
-    public void move(double distance){
-        if (distance < 0){
-            System.out.println("Invalid distance.");
-            return;
+    public void move(double distance) throws InvalidOperationException, InsufficientFuelException{
+        if (distance<0){
+            throw new InvalidOperationException("Distance cannot be less than 0");
         }
+
         double efficiency = calculateFuelEfficiency();
-        if (efficiency == 0){
-            System.out.println("Sailing with cargo for " + distance + " km with sail");
+        if (efficiency==0){                                          // if fuel efficiency is 0, that means cargoship is sailing
             setCurrentMileage(getCurrentMileage() + distance);
-        } else {
+            System.out.println("Sailing with cargo for " + distance + " km using sails");
+        }
+        else{                                                        // using fuel
             double fuelNeeded = distance/efficiency;
             if (fuelLevel >= fuelNeeded){
                 fuelLevel -= fuelNeeded;
                 setCurrentMileage(getCurrentMileage() + distance);
                 System.out.println("Sailing with cargo for " + distance + " km using fuel");
-            } else{
-                System.out.println("Not enough fuel to sail " + distance + " km");
+            } 
+            else{
+                throw new InsufficientFuelException("Not enough fuel to sail " + distance + " km");
             }
         }
     }
@@ -50,23 +55,25 @@ public class CargoShip extends WaterVehicle implements CargoCarrier, Maintainabl
     }
 
     @Override
-    public void loadCargo(double weight){
-        if (weight > 0 && currentCargo + weight <= cargoCapacity) {
-            currentCargo += weight;
-        } 
-        else{
-            System.out.println("Cargo overload or invalid weight");
+    public void loadCargo(double weight) throws OverloadException, InvalidOperationException{
+        if (weight <= 0){
+            throw new InvalidOperationException("Cargo weight must be positive");
         }
+        if (currentCargo+weight > cargoCapacity){
+            throw new OverloadException("Cargo overload: exceeds capacity of " + cargoCapacity + " kg");
+        }
+        currentCargo += weight;
     }
 
     @Override
-    public void unloadCargo(double weight){
-        if ((weight>0) && weight <= currentCargo){
-            currentCargo -= weight;
-        } 
-        else{
-            System.out.println("Cannot unload cargo: invalid weight or more than present.");
+    public void unloadCargo(double weight) throws InvalidOperationException{
+        if (weight<=0){
+            throw new InvalidOperationException("Unload weight must be positive");
         }
+        if (weight>currentCargo){
+            throw new InvalidOperationException("Cannot unload more cargo than currently loaded (" + currentCargo + " kg)");
+        }
+        currentCargo -= weight;
     }
 
     @Override
@@ -86,34 +93,33 @@ public class CargoShip extends WaterVehicle implements CargoCarrier, Maintainabl
 
     @Override
     public boolean needsMaintenance(){
-        return ((getCurrentMileage()>10000) || maintenanceNeeded);
+        return getCurrentMileage()>10000 || maintenanceNeeded;
     }
 
     @Override
-    public void performMaintenance(){
+    public void performMaintenance() {
         maintenanceNeeded = false;
         System.out.println("Cargo ship maintenance done.");
     }
 
     @Override
-    public void refuel(double amount){
-        if (!hasSail() && amount>0){
-            fuelLevel += amount;
-        } 
-        else if (hasSail()){
-            System.out.println("This ship doesn't use fuel.");
+    public void refuel(double amount) throws InvalidOperationException {
+        if (hasSail()){
+            throw new InvalidOperationException("Ship uses sails, cannot be refueled");
         }
+        if (amount <= 0){
+            throw new InvalidOperationException("Refuel amount must be more than 0");
+        }
+        fuelLevel += amount;
     }
 
     @Override
-    public double getFuelLevel(){
-        if (hasSail()) return 0.0;
-        else return fuelLevel;
+    public double getFuelLevel() {
+        return hasSail()?0.0 : fuelLevel;
     }
 
-    
     @Override
-    public double consumeFuel(double distance){
+    public double consumeFuel(double distance) throws InsufficientFuelException{
         if (hasSail()){
             return 0.0;
         }
@@ -122,6 +128,6 @@ public class CargoShip extends WaterVehicle implements CargoCarrier, Maintainabl
             fuelLevel -= needed;
             return needed;
         }
-        return 0;
+        throw new InsufficientFuelException("Not enough fuel for " + distance + " km");
     }
 }

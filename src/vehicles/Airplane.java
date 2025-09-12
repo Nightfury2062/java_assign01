@@ -2,6 +2,9 @@ package vehicles;
 
 import interfaces.FuelConsumable;
 import interfaces.PassengerCarrier;
+import exceptions.InsufficientFuelException;
+import exceptions.InvalidOperationException;
+import exceptions.OverloadException;
 import interfaces.CargoCarrier;
 import interfaces.Maintainable;
 
@@ -14,7 +17,7 @@ public class Airplane extends AirVehicle implements FuelConsumable, PassengerCar
     private double currentCargo;
     private boolean maintenanceNeeded;
 
-    public Airplane(String id, String model, double maxSpeed, double currentMileage, double maxAltitude){
+    public Airplane(String id, String model, double maxSpeed, double currentMileage, double maxAltitude)throws InvalidOperationException{
         super(id, model,maxSpeed,currentMileage,maxAltitude);
         this.fuelLevel = 0.0;
         this.passengerCapacity = 200;
@@ -22,32 +25,33 @@ public class Airplane extends AirVehicle implements FuelConsumable, PassengerCar
     }
 
     @Override
-    public void move(double distance){
-        if (distance< 0){
-            System.out.println("Invalid distance.");
-            return;
+    public void move(double distance) throws InvalidOperationException, InsufficientFuelException {
+        if (distance<0) {
+            throw new InvalidOperationException("Invalid Distance");
         }
+
         double fuelNeeded = distance/calculateFuelEfficiency();
+
         if (fuelLevel >= fuelNeeded){
             fuelLevel -= fuelNeeded;
-            setCurrentMileage(getCurrentMileage() + distance);
+            setCurrentMileage(getCurrentMileage()+distance);
             System.out.println("Flying at " + getMaxAltitude() + " meters for " + distance + " km");
         } 
         else{
-            System.out.println("Not enough fuel to fly " + distance + " km");
+            throw new InsufficientFuelException("Not enough fuel to fly " + distance + " km");
         }
     }
-
     @Override
     public double calculateFuelEfficiency(){
         return 5.0;
     }
 
     @Override
-    public void refuel(double amount){
-        if (amount>0){
-            fuelLevel += amount;
-        }
+    public void refuel(double amount)throws InvalidOperationException{
+        if (amount <= 0){
+        throw new InvalidOperationException("Refuel amount must be more than 0");
+    }
+    fuelLevel+=amount;
     }
 
     @Override
@@ -56,33 +60,36 @@ public class Airplane extends AirVehicle implements FuelConsumable, PassengerCar
     }
 
     @Override
-    public double consumeFuel(double distance){
-        double needed = distance/calculateFuelEfficiency();
-        if (fuelLevel >= needed){
-            fuelLevel -= needed;
-            return needed;
+    public double consumeFuel(double distance)throws InsufficientFuelException{
+        double fuelNeeded=distance/calculateFuelEfficiency();
+        if (fuelLevel >= fuelNeeded){
+            fuelLevel -= fuelNeeded;
+            return fuelNeeded;
         }
-        return 0;
+
+        throw new InsufficientFuelException("Not enough fuel for " + distance + "km");
     }
 
     @Override
-    public void boardPassengers(int count){
-        if (currentPassengers + count <= passengerCapacity) {
-            currentPassengers += count;
-        } 
-        else{
-            System.out.println("Passenger Overflow: Cannot board passengers");
-        }
+    public void boardPassengers(int count) throws OverloadException, InvalidOperationException{
+        if (count<=0){
+        throw new InvalidOperationException("Passenger count must be more than 0");
+    }
+    if (currentPassengers+count > passengerCapacity){
+        throw new OverloadException("Passenger overflow:Capacity exceeded");
+    }
+    currentPassengers += count;
     }
 
     @Override
-    public void disembarkPassengers(int count){
-        if (count <= currentPassengers) {
-            currentPassengers -= count;
-        } 
-        else{
-            System.out.println("Cannot disembark more passengers than present.");
-        }
+    public void disembarkPassengers(int count)throws InvalidOperationException{
+        if (count <= 0){
+        throw new InvalidOperationException("Passenger count must be more than 0");
+    }
+    if (count>currentPassengers){
+        throw new InvalidOperationException("Cannot disembark more passengers than present");
+    }
+    currentPassengers -= count;
     }
 
     @Override
@@ -96,23 +103,25 @@ public class Airplane extends AirVehicle implements FuelConsumable, PassengerCar
     }
 
     @Override
-    public void loadCargo(double weight){
-        if (weight > 0 && currentCargo + weight <= cargoCapacity){
-            currentCargo += weight;
-        } 
-        else{
-            System.out.println("Cannot load cargo: capacity exceeded or invalid weight.");
+    public void loadCargo(double weight) throws OverloadException, InvalidOperationException{
+        if (weight <= 0){
+            throw new InvalidOperationException("Cargo weight must be more than 0");
         }
+        if (currentCargo+weight > cargoCapacity){
+            throw new OverloadException("Cargo overload: exceeds capacity of " + cargoCapacity + " kg");
+        }
+        currentCargo += weight;
     }
 
     @Override
-    public void unloadCargo(double weight){
-        if (weight > 0 && weight <= currentCargo){
-            currentCargo -= weight;
-        } 
-        else{
-            System.out.println("Cannot unload cargo: invalid weight or more than present.");
+    public void unloadCargo(double weight) throws InvalidOperationException{
+        if (weight <= 0){
+            throw new InvalidOperationException("Unload weight must be positive");
         }
+        if (weight>currentCargo){
+            throw new InvalidOperationException("Cannot unload more cargo than currently loaded (" + currentCargo + " kg)");
+        }
+        currentCargo -= weight;
     }
 
     @Override

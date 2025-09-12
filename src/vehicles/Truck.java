@@ -15,15 +15,12 @@ public class Truck extends LandVehicle implements FuelConsumable,CargoCarrier,Ma
     private double cargoCapacity;
     private int currentCargo;
     private boolean maintenanceNeeded;
-    private int passengerCapacity;
-    private int currentPassengers;
 
     public Truck(String id,String model,double maxSpeed,double currentMileage,int numWheels)throws InvalidOperationException{
         super(id, model, maxSpeed, currentMileage, numWheels);
         this.fuelLevel=0.0;
         this.cargoCapacity=5000;
-        this.passengerCapacity = 2;
-        //passengers, currentCargo will automatically be set to 0 maintainceNeeded will automatically be false
+        //currentCargo will automatically be set to 0 maintainceNeeded will automatically be false
 
     }
 
