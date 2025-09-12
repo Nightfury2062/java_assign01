@@ -1,5 +1,9 @@
 package vehicles;
 
+import exceptions.InvalidOperationException;
+import exceptions.OverloadException;
+import exceptions.InsufficientFuelException;
+
 import interfaces.FuelConsumable;
 import interfaces.PassengerCarrier;
 import interfaces.Maintainable;
@@ -11,7 +15,7 @@ public class Car extends LandVehicle implements FuelConsumable,PassengerCarrier,
     private int currentPassengers;
     private boolean maintenanceNeeded;
 
-    public Car(String id,String model,double maxSpeed,double currentMileage,int numWheels){
+    public Car(String id,String model,double maxSpeed,double currentMileage,int numWheels)throws InvalidOperationException{
         super(id, model, maxSpeed, currentMileage, numWheels);
         this.fuelLevel=0.0;
         this.passengerCapacity=5;
@@ -20,7 +24,10 @@ public class Car extends LandVehicle implements FuelConsumable,PassengerCarrier,
     }
 
     @Override
-    public void move(double distance){
+    public void move(double distance)throws InvalidOperationException,InsufficientFuelException{
+        if(distance<0){
+            throw new InvalidOperationException("Distance can't be less than 0");
+        }
 
         double fuelNeeded=distance/calculateFuelEfficiency();
 
@@ -30,7 +37,7 @@ public class Car extends LandVehicle implements FuelConsumable,PassengerCarrier,
             System.out.println("Driving on road for "+distance+"km");
         } 
         else{
-            System.out.println("Not enough fuel to drive for " +distance +"km");
+            throw new InsufficientFuelException("Not enough fuel to drive for " +distance +"km");
         }
     }
 
@@ -40,13 +47,11 @@ public class Car extends LandVehicle implements FuelConsumable,PassengerCarrier,
     }
 
     @Override
-    public void refuel(double amount){
-        if (amount>0){
-            fuelLevel += amount;
-        }
-        else{
-            System.out.println("Not enough fuel");
-        }
+    public void refuel(double amount)throws InvalidOperationException{
+        if (amount <= 0){
+        throw new InvalidOperationException("Refuel amount must be more than 0");
+    }
+    fuelLevel+=amount;
     }
 
     @Override
@@ -55,34 +60,37 @@ public class Car extends LandVehicle implements FuelConsumable,PassengerCarrier,
     }
 
     @Override
-    public double consumeFuel(double distance){
+    public double consumeFuel(double distance)throws InsufficientFuelException{
         double fuelNeeded=distance/calculateFuelEfficiency();
         if (fuelLevel >= fuelNeeded){
             fuelLevel -= fuelNeeded;
             return fuelNeeded;
         }
 
-        return 0;
+        throw new InsufficientFuelException("Not enough fuel for " + distance + "km");
     }
 
     @Override
-    public void boardPassengers(int count){
-        if (currentPassengers+count <= passengerCapacity){
-            currentPassengers += count;
-        } 
-        else{
-            System.out.println("Passenger overflow: Limit exceeded");
-        }
+    public void boardPassengers(int count) throws OverloadException, InvalidOperationException{
+        if (count<=0){
+        throw new InvalidOperationException("Passenger count must be more than 0");
     }
+    if (currentPassengers+count > passengerCapacity){
+        throw new OverloadException("Passenger overflow:Capacity exceeded");
+    }
+    currentPassengers += count;
+    }
+    
 
     @Override
-    public void disembarkPassengers(int count){
-        if (count <= currentPassengers){
-            currentPassengers -= count;
-        } 
-        else{
-            System.out.println("Passenger underflow: Not enough passengers");
-        }
+    public void disembarkPassengers(int count)throws InvalidOperationException{
+        if (count <= 0){
+        throw new InvalidOperationException("Passenger count must be more than 0");
+    }
+    if (count>currentPassengers){
+        throw new InvalidOperationException("Cannot disembark more passengers than present");
+    }
+    currentPassengers -= count;
     }
 
     @Override

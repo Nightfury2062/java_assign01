@@ -1,4 +1,6 @@
 package vehicles;
+import exceptions.InsufficientFuelException;
+import exceptions.InvalidOperationException;
 
 abstract class Vehicle {
     private String id;
@@ -6,9 +8,9 @@ abstract class Vehicle {
     private double maxSpeed;
     private double currentMileage;
 
-    public Vehicle(String id, String model, double maxSpeed,double currentMileage){
+    public Vehicle(String id, String model, double maxSpeed,double currentMileage)throws InvalidOperationException{
         if(id == null || id.trim().isEmpty()){
-            // throw new InvalidOperationException("Vehicle ID cannot be empty");
+            throw new InvalidOperationException("Vehicle ID cannot be empty");
              
         }
         this.id = id;
@@ -31,6 +33,9 @@ abstract class Vehicle {
     String getID(){
         return id;
     }
+    String getmModel(){
+        return model;
+    }
     double getMaxSpeed(){
         return maxSpeed;
     }
@@ -41,7 +46,7 @@ abstract class Vehicle {
 
     //Abstract methods
 
-    abstract void move(double distance);
+    abstract void move(double distance)throws InvalidOperationException, InsufficientFuelException;;
     abstract double calculateFuelEfficiency();
     abstract double estimateJourneyTime(double distance);
 
