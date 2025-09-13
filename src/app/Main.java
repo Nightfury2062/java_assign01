@@ -11,7 +11,7 @@ import interfaces.FuelConsumable;
 import interfaces.Maintainable;
 import exceptions.*;
 
-public class Main {
+public class Main{
 
     public static void main(String[] args) {
         FleetManager fleet_m = new FleetManager();
@@ -236,10 +236,6 @@ public class Main {
             for (Vehicle v:found) v.displayInfo();
         }
     }
-
-
-    //   EDIT FROM HERE
-
     
     private static void handleListMaintenance(FleetManager fm){
         List<Vehicle> needing = fm.getVehiclesNeedingMaintenance();
@@ -253,47 +249,52 @@ public class Main {
     }
 
 
-    private static String readNonEmptyString(Scanner sc, String prompt) {
+    private static String readNonEmptyString(Scanner sc, String prompt){
         String s;
-        do {
+        do{
             System.out.print(prompt);
             s = sc.nextLine().trim();
-        } while (s.isEmpty());
+        } 
+        while (s.isEmpty());
         return s;
     }
 
-    private static int readInt(Scanner sc, String prompt, int min, int max) {
-        while (true) {
+    private static int readInt(Scanner sc, String prompt, int min, int max){
+        while (true){
             System.out.print(prompt);
-            String line = sc.nextLine().trim();
-            try {
+            String line=sc.nextLine().trim();
+            try{
                 int val = Integer.parseInt(line);
                 if (val < min || val > max) {
                     System.out.println("Please enter an integer between " + min + " and " + max + ".");
-                } else return val;
-            } catch (NumberFormatException e) {
+                }
+                else return val;
+            } 
+            catch(NumberFormatException e){
                 System.out.println("Invalid integer. Try again.");
             }
         }
     }
 
-    private static double readDouble(Scanner sc, String prompt, double min, double max) {
-        while (true) {
+    private static double readDouble(Scanner sc, String prompt, double min, double max){
+        while (true){
             System.out.print(prompt);
-            String line = sc.nextLine().trim();
-            try {
+            String line=sc.nextLine().trim();
+            try{
                 double val = Double.parseDouble(line);
-                if (val < min || val > max) {
+                if (val<min || val>max){
                     System.out.println("Please enter a number between " + min + " and " + max + ".");
-                } else return val;
-            } catch (NumberFormatException e) {
+                }
+                else return val;
+            } 
+            catch(NumberFormatException e){
                 System.out.println("Invalid number. Try again.");
             }
         }
     }
 
-    private static boolean readBooleanYesNo(Scanner sc, String prompt) {
-        while (true) {
+    private static boolean readBooleanYesNo(Scanner sc, String prompt){
+        while(true){
             System.out.print(prompt);
             String s = sc.nextLine().trim().toLowerCase();
             if (s.equals("y") || s.equals("yes")) return true;

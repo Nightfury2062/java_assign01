@@ -13,7 +13,6 @@ import interfaces.FuelConsumable;
 import interfaces.Maintainable;
 import exceptions.InvalidOperationException;
 import exceptions.InsufficientFuelException;
-import exceptions.OverloadException;
 
 public class FleetManager{
     private final List<Vehicle> fleet;
