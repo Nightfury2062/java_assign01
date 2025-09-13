@@ -142,25 +142,25 @@ public class FleetManager{
     }
 
     public void saveToFile(String filename) throws IOException{
-        try (PrintWriter pw = new PrintWriter(new FileWriter(filename))){
+        try (PrintWriter prnt_writer = new PrintWriter(new FileWriter(filename))){
                 for (Vehicle v:fleet){
                     if (v instanceof Car){
                         Car c=(Car) v;
-                        pw.printf("Car,%s,%s,%.2f,%.2f,%d,%.2f,%d,%d%n",
+                        prnt_writer.printf("Car,%s,%s,%.2f,%.2f,%d,%.2f,%d,%d%n",
                                 c.getID(), c.getModel(), c.getMaxSpeed(), c.getCurrentMileage(),
                                 c.getNumWheels(), c.getFuelLevel(), 
                                 c.getPassengerCapacity(), c.getCurrentPassengers());
                     } 
                     else if (v instanceof Truck){
                         Truck t=(Truck)v;
-                        pw.printf("Truck,%s,%s,%.2f,%.2f,%d,%.2f,%.2f,%.2f%n",
+                        prnt_writer.printf("Truck,%s,%s,%.2f,%.2f,%d,%.2f,%.2f,%.2f%n",
                                 t.getID(), t.getModel(), t.getMaxSpeed(), t.getCurrentMileage(),
                                 t.getNumWheels(), t.getFuelLevel(),
                                 t.getCargoCapacity(), t.getCurrentCargo());
                     } 
                     else if (v instanceof Bus){
                         Bus b=(Bus)v;
-                        pw.printf("Bus,%s,%s,%.2f,%.2f,%d,%.2f,%d,%d,%.2f,%.2f%n",
+                        prnt_writer.printf("Bus,%s,%s,%.2f,%.2f,%d,%.2f,%d,%d,%.2f,%.2f%n",
                                 b.getID(), b.getModel(), b.getMaxSpeed(), b.getCurrentMileage(),
                                 b.getNumWheels(), b.getFuelLevel(),
                                 b.getPassengerCapacity(), b.getCurrentPassengers(),
@@ -168,7 +168,7 @@ public class FleetManager{
                     }
                     else if (v instanceof Airplane){
                         Airplane a = (Airplane) v;
-                        pw.printf("Airplane,%s,%s,%.2f,%.2f,%.2f,%.2f,%d,%d,%.2f,%.2f%n",
+                        prnt_writer.printf("Airplane,%s,%s,%.2f,%.2f,%.2f,%.2f,%d,%d,%.2f,%.2f%n",
                                 a.getID(), a.getModel(), a.getMaxSpeed(), a.getCurrentMileage(),
                                 a.getMaxAltitude(), a.getFuelLevel(),
                                 a.getPassengerCapacity(), a.getCurrentPassengers(),
@@ -176,7 +176,7 @@ public class FleetManager{
                     } 
                     else if (v instanceof CargoShip){
                         CargoShip cs=(CargoShip) v;
-                        pw.printf("CargoShip,%s,%s,%.2f,%.2f,%b,%.2f,%.2f,%.2f%n",
+                        prnt_writer.printf("CargoShip,%s,%s,%.2f,%.2f,%b,%.2f,%.2f,%.2f%n",
                                 cs.getID(), cs.getModel(), cs.getMaxSpeed(), cs.getCurrentMileage(),
                                 cs.hasSail(), cs.getFuelLevel(),
                                 cs.getCargoCapacity(), cs.getCurrentCargo());
@@ -184,6 +184,108 @@ public class FleetManager{
                 }
             }
         }
+
+    public void loadFromFile(String filename) throws IOException{
+        List<Vehicle> load1=new ArrayList<>();
+        try (BufferedReader br=new BufferedReader(new FileReader(filename))){
+            String line;
+            int lineNo=0;
+            while ((line = br.readLine())!=null){
+                lineNo++;
+                if (line.trim().isEmpty()) continue;
+                String[] tokens=splitCsvLine(line);
+                try{
+                    Vehicle v=VehicleFactory.createVehicle(tokens);
+                    load1.add(v);
+                } 
+                catch(Exception e){
+                    System.out.println("Skipping line " + lineNo + ": " + e.getMessage());
+                }
+            }
+        }
+        // replace fleet with loaded vehicles
+        fleet.clear();
+        fleet.addAll(load1);
+    }
+
+    private String[] splitCsvLine(String line) {
+        return line.split(",", -1);
+    }
+
+
+    private static class VehicleFactory{
+        static Vehicle createVehicle(String[] tok) throws Exception{
+            if (tok.length==0) throw new InvalidOperationException("Empty CSV line");
+            String type=tok[0].trim();
+
+            switch (type){
+                case "Car":{
+                    if (tok.length < 9) throw new InvalidOperationException("Malformed Car CSV");
+                    String id = tok[1];
+                    String model = tok[2];
+                    double maxSpeed = Double.parseDouble(tok[3]);
+                    double currentMileage = Double.parseDouble(tok[4]);
+                    int numWheels = Integer.parseInt(tok[5]);
+                    Car c = new Car(id, model, maxSpeed, currentMileage, numWheels);
+                    return c;
+                }
+                case "Truck":{
+                    if (tok.length < 9) throw new InvalidOperationException("Malformed Truck CSV");
+                    String id = tok[1];
+                    String model = tok[2];
+                    double maxSpeed = Double.parseDouble(tok[3]);
+                    double currentMileage = Double.parseDouble(tok[4]);
+                    int numWheels = Integer.parseInt(tok[5]);
+                    Truck t = new Truck(id, model, maxSpeed, currentMileage, numWheels);
+                    try{t.refuel(Double.parseDouble(tok[6]));}
+                    catch (Exception ignored){}
+                    return t;
+                }
+                case "Bus":{
+                    if (tok.length < 11) throw new InvalidOperationException("Malformed Bus CSV");
+                    String id = tok[1];
+                    String model = tok[2];
+                    double maxSpeed = Double.parseDouble(tok[3]);
+                    double currentMileage = Double.parseDouble(tok[4]);
+                    int numWheels = Integer.parseInt(tok[5]);
+                    Bus b=new Bus(id, model, maxSpeed, currentMileage, numWheels);
+                    try {b.refuel(Double.parseDouble(tok[6]));} 
+                    catch (Exception ignored) {}
+                    return b;
+                }
+                case "Airplane":{
+                    if (tok.length<11) throw new InvalidOperationException("Malformed Airplane CSV");
+                    String id = tok[1];
+                    String model = tok[2];
+                    double maxSpeed = Double.parseDouble(tok[3]);
+                    double currentMileage = Double.parseDouble(tok[4]);
+                    double maxAltitude = Double.parseDouble(tok[5]);
+                    Airplane a=new Airplane(id, model, maxSpeed, currentMileage, maxAltitude);
+                    try {a.refuel(Double.parseDouble(tok[6]));}
+                    catch (Exception ignored) {}
+                    return a;
+                }
+                case "CargoShip":{
+                    if (tok.length < 9) throw new InvalidOperationException("Malformed CargoShip CSV");
+                    String id = tok[1];
+                    String model = tok[2];
+                    double maxSpeed = Double.parseDouble(tok[3]);
+                    double currentMileage = Double.parseDouble(tok[4]);
+                    boolean hasSail = Boolean.parseBoolean(tok[5]);
+                    CargoShip cs = new CargoShip(id, model, maxSpeed, currentMileage, hasSail);
+                    try {cs.refuel(Double.parseDouble(tok[6]));}
+                    catch (Exception ignored) {}
+                    return cs;
+                }
+                default:
+                    throw new InvalidOperationException("Unknown vehicle type: " + type);
+            }
+        }
+    }
+
+    public List<Vehicle> getFleetSnapshot() {
+        return new ArrayList<>(fleet);
+    }
 
 
 

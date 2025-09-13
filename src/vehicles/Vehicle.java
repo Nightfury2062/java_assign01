@@ -21,7 +21,7 @@ public abstract class Vehicle implements Comparable<Vehicle>{
 
     //Concrete methods
 
-    void displayInfo(){
+    public void displayInfo(){
         System.out.printf(
             "Vehicle Info:\nID: %s\nModel: %s\nMax Speed: %.2f km/h\nCurrent Mileage: %.2f km\n",
             id, model, maxSpeed, currentMileage
