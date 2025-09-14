@@ -16,7 +16,7 @@ public class Main{
     public static void main(String[] args) {
         FleetManager fleet_m = new FleetManager();
         // Demo
-        createDemo(fleet_m);
+        // createDemo(fleet_m);
 
         // Launch CLI
         try (Scanner sc = new Scanner(System.in)){
@@ -24,36 +24,36 @@ public class Main{
         }
     }
 
-    private static void createDemo(FleetManager fm){
-        System.out.println("Creating demo vehicles");
-        try {
-            Car car1 = new Car("CAR001", "Maruti", 110.0, 0.0, 4);
-            Truck truck1 = new Truck("TRK001", "Tesla", 90.0, 0.0, 6);
-            Bus bus1 = new Bus("BUS001", "Tata", 80.0, 0.0, 6);
-            Airplane ap1 = new Airplane("AIR001", "Indigo", 900.0, 0.0, 10000.0);
-            CargoShip cs1 = new CargoShip("SHP001", "SCI", 40.0, 0.0, true);
+    // private static void createDemo(FleetManager fm){
+    //     System.out.println("Creating demo vehicles");
+    //     try {
+    //         Car car1 = new Car("CAR001", "Maruti", 110.0, 0.0, 4);
+    //         Truck truck1 = new Truck("TRK001", "Tesla", 90.0, 0.0, 6);
+    //         Bus bus1 = new Bus("BUS001", "Tata", 80.0, 0.0, 6);
+    //         Airplane ap1 = new Airplane("AIR001", "Indigo", 900.0, 0.0, 10000.0);
+    //         CargoShip cs1 = new CargoShip("SHP001", "SCI", 40.0, 0.0, true);
 
-            fm.addVehicle(car1);
-            fm.addVehicle(truck1);
-            fm.addVehicle(bus1);
-            fm.addVehicle(ap1);
-            fm.addVehicle(cs1);
-        } 
-        catch (InvalidOperationException e){
-            System.out.println("Demo setup error: " + e.getMessage());
-        }
+    //         fm.addVehicle(car1);
+    //         fm.addVehicle(truck1);
+    //         fm.addVehicle(bus1);
+    //         fm.addVehicle(ap1);
+    //         fm.addVehicle(cs1);
+    //     } 
+    //     catch (InvalidOperationException e){
+    //         System.out.println("Demo setup error: " + e.getMessage());
+    //     }
 
-        // Simulate a 100 km journey and print report
-        Map<String, String> outcomes = fm.startAllJourneys(100.0);
-        System.out.println("Demo journeys:");
-        outcomes.forEach((id, status) -> System.out.println(id + " -> " + status));
+    //     // Simulate a 100 km journey and print report
+    //     Map<String, String> outcomes = fm.startAllJourneys(100.0);
+    //     System.out.println("Demo journeys:");
+    //     outcomes.forEach((id, status) -> System.out.println(id + " -> " + status));
 
-        System.out.println("\nDemo report:\n" + fm.generateReport());
+    //     System.out.println("\nDemo report:\n" + fm.generateReport());
 
-        //UNCOMMENT FOR 1ST RUN-: (TO GENERATE SAMPLE CSV)
+    //     //UNCOMMENT FOR 1ST RUN-: (TO GENERATE SAMPLE CSV)
 
-        // try { fm.saveToFile("sample_fleet.csv"); } catch (IOException e) { System.out.println("Failed to save demo CSV: " + e.getMessage()); }
-    }
+    //     try { fm.saveToFile("sample_fleet.csv"); } catch (IOException e) { System.out.println("Failed to save demo CSV: " + e.getMessage()); }
+    // }
 
     private static void runCliLoop(Scanner sc,FleetManager fm){
         while (true){
