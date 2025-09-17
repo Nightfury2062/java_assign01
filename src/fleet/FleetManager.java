@@ -3,16 +3,9 @@ package fleet;
 import java.util.*;
 import java.io.*;
 
-import vehicles.Airplane;
-import vehicles.Bus;
-import vehicles.Car;
-import vehicles.CargoShip;
-import vehicles.Truck;
-import vehicles.Vehicle;
-import interfaces.FuelConsumable;
-import interfaces.Maintainable;
-import exceptions.InvalidOperationException;
-import exceptions.InsufficientFuelException;
+import vehicles.*;
+import interfaces.*;
+import exceptions.*;
 
 public class FleetManager{
     private final List<Vehicle> fleet;
@@ -120,11 +113,9 @@ public class FleetManager{
 
         str_bldr.append("By type:\n");
         byType.forEach((k,c)-> str_bldr.append("  ").append(k).append(": ").append(c).append("\n"));
-
+        str_bldr.append("Total mileage: ").append(totalMileage).append(" km\n");
         str_bldr.append("Avg fuel efficiency: ");
         str_bldr.append(effCount>0 ? String.format("%.2f km/l", totalEff / effCount) : "N/A").append("\n");
-
-        str_bldr.append("Total mileage: ").append(totalMileage).append(" km\n");
         str_bldr.append("Vehicles needing maintenance: ").append(maintenanceCount).append("\n");
 
         return str_bldr.toString();

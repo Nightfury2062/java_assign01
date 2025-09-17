@@ -47,6 +47,8 @@ java -cp bin app.Main
 
 This runs the demo (creates sample vehicles, simulates a journey) and then launches the interactive CLI.
 
+## UML diagram in folder out
+
 ## Testing persistence with the sample CSV
 
 1. Place `sample_fleet.csv` in the project root.

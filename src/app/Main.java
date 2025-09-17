@@ -12,63 +12,29 @@ import interfaces.Maintainable;
 import exceptions.*;
 
 public class Main{
+    public static void main(String[] args){
+        FleetManager fleet_m=new FleetManager();
 
-    public static void main(String[] args) {
-        FleetManager fleet_m = new FleetManager();
-        // Demo
-        // createDemo(fleet_m);
-
-        // Launch CLI
         try (Scanner sc = new Scanner(System.in)){
-            runCliLoop(sc, fleet_m);
+            run_cli_loop(sc, fleet_m);
         }
     }
 
-    // private static void createDemo(FleetManager fm){
-    //     System.out.println("Creating demo vehicles");
-    //     try {
-    //         Car car1 = new Car("CAR001", "Maruti", 110.0, 0.0, 4);
-    //         Truck truck1 = new Truck("TRK001", "Tesla", 90.0, 0.0, 6);
-    //         Bus bus1 = new Bus("BUS001", "Tata", 80.0, 0.0, 6);
-    //         Airplane ap1 = new Airplane("AIR001", "Indigo", 900.0, 0.0, 10000.0);
-    //         CargoShip cs1 = new CargoShip("SHP001", "SCI", 40.0, 0.0, true);
 
-    //         fm.addVehicle(car1);
-    //         fm.addVehicle(truck1);
-    //         fm.addVehicle(bus1);
-    //         fm.addVehicle(ap1);
-    //         fm.addVehicle(cs1);
-    //     } 
-    //     catch (InvalidOperationException e){
-    //         System.out.println("Demo setup error: " + e.getMessage());
-    //     }
-
-    //     // Simulate a 100 km journey and print report
-    //     Map<String, String> outcomes = fm.startAllJourneys(100.0);
-    //     System.out.println("Demo journeys:");
-    //     outcomes.forEach((id, status) -> System.out.println(id + " -> " + status));
-
-    //     System.out.println("\nDemo report:\n" + fm.generateReport());
-
-    //     //UNCOMMENT FOR 1ST RUN-: (TO GENERATE SAMPLE CSV)
-
-    //     try { fm.saveToFile("sample_fleet.csv"); } catch (IOException e) { System.out.println("Failed to save demo CSV: " + e.getMessage()); }
-    // }
-
-    private static void runCliLoop(Scanner sc,FleetManager fm){
+    private static void run_cli_loop(Scanner sc,FleetManager fm){
         while (true){
             printMenu();
             int choose= readInt(sc, "Choose an option: ", 1, 11);
             try{
                 switch(choose){
-                    case 1: handleAddVehicle(sc,fm);break;
-                    case 2: handleRemoveVehicle(sc,fm);break;
-                    case 3: handleStartJourney(sc, fm);break;
-                    case 4: handleRefuelAll(sc,fm);break;
-                    case 5: handlePerformMaintenance(fm);break;
+                    case 1: handle_add_v(sc,fm);break;
+                    case 2: handle_remove_v(sc,fm);break;
+                    case 3: handle_start_journey(sc, fm);break;
+                    case 4: handle_refuel(sc,fm);break;
+                    case 5: handle_perform_maintenance(fm);break;
                     case 6: System.out.println(fm.generateReport());break;
-                    case 7: handleSaveFleet(sc,fm);break;
-                    case 8: handleLoadFleet(sc,fm);break;
+                    case 7: handle_save_fleet(sc,fm);break;
+                    case 8: handle_load_fleet(sc,fm);break;
                     case 9: handleSearchByType(sc,fm);break;
                     case 10: handleListMaintenance(fm);break;
                     case 11: System.out.println("Exiting"); return;
@@ -96,8 +62,8 @@ public class Main{
         System.out.println("10. List Vehicles Needing Maintenance");
         System.out.println("11. Exit");
     }
-     //handlers
-    private static void handleAddVehicle(Scanner sc, FleetManager fm){
+
+    private static void handle_add_v(Scanner sc,FleetManager fm){
         System.out.println("Select vehicle type: 1=Car 2=Truck 3=Bus 4=Airplane 5=CargoShip");
         int t = readInt(sc, "Type: ", 1, 5);
         String id = readNonEmptyString(sc, "Enter ID: ");
@@ -136,7 +102,7 @@ public class Main{
                     break;
                 }
                 case 5:{
-                    boolean hasSail = readBooleanYesNo(sc, "Does the ship have sails? (y/n): ");
+                    boolean hasSail = r_bool_y_n(sc, "Does the ship have sails? (y/n): ");
                     CargoShip cs = new CargoShip(id, model, maxSpeed, currentMileage, hasSail);
                     fm.addVehicle(cs);
                     System.out.println("CargoShip added.");
@@ -149,7 +115,14 @@ public class Main{
         }
     }
 
-    private static void handleRemoveVehicle(Scanner sc, FleetManager fm){
+    private static void handle_start_journey(Scanner sc, FleetManager fm){
+        double d = readDouble(sc, "Enter distance in km : ", 0, Double.MAX_VALUE);
+        Map<String, String> res = fm.startAllJourneys(d);
+        System.out.println("Journey results:");
+        res.forEach((id, status) -> System.out.println(id + " -> " + status));
+    }
+
+    private static void handle_remove_v(Scanner sc,FleetManager fm){
         String id = readNonEmptyString(sc, "Enter vehicle ID to remove: ");
         try{
             fm.removeVehicle(id);
@@ -160,15 +133,15 @@ public class Main{
         }
     }
 
-    private static void handleStartJourney(Scanner sc, FleetManager fm){
-        double d = readDouble(sc, "Enter distance in km : ", 0, Double.MAX_VALUE);
-        Map<String, String> res = fm.startAllJourneys(d);
-        System.out.println("Journey results:");
-        res.forEach((id, status) -> System.out.println(id + " -> " + status));
+
+    private static void handle_perform_maintenance(FleetManager fm){
+        fm.maintainAll();
+        System.out.println("Maintenance check performed for all vehicles :) .");
     }
 
-    private static void handleRefuelAll(Scanner sc, FleetManager fm){
-        double amt = readDouble(sc, "Enter amount of fuel to add to each fuel vehicle (liters): ", 0.0001, Double.MAX_VALUE);
+
+    private static void handle_refuel(Scanner sc, FleetManager fm){
+        double amt = readDouble(sc, "Enter amount of fuel to add to each fuel vehicle in L: ", 0.0001, Double.MAX_VALUE);
         for (Vehicle v:fm.getFleetSnapshot()){
             if (v instanceof FuelConsumable){
                 FuelConsumable fc=(FuelConsumable)v;
@@ -183,12 +156,7 @@ public class Main{
         }
     }
 
-    private static void handlePerformMaintenance(FleetManager fm){
-        fm.maintainAll();
-        System.out.println("Maintenance check performed for all vehicles :) .");
-    }
-
-    private static void handleSaveFleet(Scanner sc, FleetManager fm){
+    private static void handle_save_fleet(Scanner sc, FleetManager fm){
         String file_name = readNonEmptyString(sc, "Enter filename to save (e.g., fleet.csv): ");
         try{
             fm.saveToFile(file_name);
@@ -199,10 +167,10 @@ public class Main{
         }
     }
 
-    private static void handleLoadFleet(Scanner sc, FleetManager fm){
+    private static void handle_load_fleet(Scanner sc, FleetManager fm){
         String file_name = readNonEmptyString(sc, "Enter filename to load (e.g., fleet.csv): ");
         System.out.println("This will replace the current fleet. Continue? (y/n)");
-        if (!readBooleanYesNo(sc, "> ")){
+        if (!r_bool_y_n(sc, "> ")){
             System.out.println("Load cancelled.");
             return;
         }
@@ -293,7 +261,7 @@ public class Main{
         }
     }
 
-    private static boolean readBooleanYesNo(Scanner sc, String prompt){
+    private static boolean r_bool_y_n(Scanner sc, String prompt){
         while(true){
             System.out.print(prompt);
             String s = sc.nextLine().trim().toLowerCase();
